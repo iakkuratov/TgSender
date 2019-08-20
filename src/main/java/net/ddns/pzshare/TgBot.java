@@ -37,7 +37,7 @@ public class TgBot extends TelegramLongPollingBot implements MsgSender{
     @Override
     public void send(Long chatId, String text) throws SendException {
         try {
-            log.debug("Trying to send msg:" + text + " for chatId:" + chatId);
+            log.debug("Trying to send msg: " + text + " for chatId: " + chatId);
 
             execute(new SendMessage().setChatId(chatId).setText(text));
 

@@ -1,9 +1,8 @@
 *.iml
+.attach_pid*
 .idea/*
 target
 *.log
 *.jar
 *.war
-*.xml
-*.properties
 hs_err_pid*

@@ -1,6 +1,5 @@
 package net.ddns.pzshare;
 
-import com.sun.net.httpserver.HttpServer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.telegram.telegrambots.ApiContextInitializer;
@@ -9,10 +8,6 @@ import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.net.InetSocketAddress;
-import java.text.ParseException;
-import java.util.HashMap;
 import java.util.Map;
 
 @SuppressWarnings("FieldCanBeLocal")
@@ -34,7 +29,7 @@ public class Application {
 
         MsgSender sender = startBot(name, token);
 
-        startHttpServer(port, sender);
+        new HttpReceiver(port, sender);
     }
 
     private static MsgSender startBot(String name, String token) {
@@ -57,66 +52,5 @@ public class Application {
         return sender;
     }
 
-    private static void startHttpServer(Integer port, MsgSender sender) throws IOException {
-        HttpServer server = HttpServer.create();
 
-        server.bind(new InetSocketAddress(port), 0);
-
-        server.createContext("/sendMsg", (http) -> {
-            String query = http.getRequestURI().getQuery();
-
-            log.debug("Get request:" + query);
-
-            int resultCode = 200;
-
-            String response = "";
-
-            try {
-                Map<String, String> params = parseQuery(query);
-
-                Long receiverId = Long.parseLong(params.get("chatId"));
-
-                String text = params.get("text");
-
-                sender.send(receiverId, text);
-
-            } catch (ParseException | NullPointerException ex) {
-                resultCode = 400;
-
-                response = ex.getMessage();
-            } catch (SendException ex) {
-                resultCode = 500;
-
-                response = "Sender exception:" + ex.getMessage();
-            }
-
-            log.debug("Response code:" + resultCode + " with response:" + response);
-
-            http.sendResponseHeaders(resultCode, response.length());
-
-            OutputStream os = http.getResponseBody();
-
-            os.write(response.getBytes());
-
-            os.close();
-        });
-
-        log.info("Starting http server on port: " + port);
-        server.start();
-    }
-
-    private static Map<String, String> parseQuery(String query) throws ParseException {
-        Map<String, String> result = new HashMap<>();
-
-        for (String param : query.split("&")) {
-            String[] kv = param.split("=");
-
-            if (kv.length == 2)
-                result.put(kv[0], kv[1]);
-            else
-                throw new ParseException("Failed to read param" + param, 0);
-        }
-
-        return result;
-    }
 }
