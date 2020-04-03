@@ -19,13 +19,16 @@ public class Application {
     private static String ENV_TG_NAME = "TGNAME";
     private static Integer DEFAULT_PORT = 8080;
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
         Map<String, String> params = System.getenv();
 
-        int port = params.containsKey(ENV_TG_PORT) ? Integer.getInteger(params.get(ENV_TG_PORT)) : DEFAULT_PORT;
+        int port = params.containsKey(ENV_TG_PORT) ? Integer.valueOf(params.get(ENV_TG_PORT)) : DEFAULT_PORT;
 
         String name = params.get(ENV_TG_NAME);
         String token = params.get(ENV_TG_TOKEN);
+
+        if (name == null | token ==null)
+            throw new Exception("TGNAME and TGTOKEN environment variables both should be specified");
 
         MsgSender sender = startBot(name, token);
 
