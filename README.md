@@ -27,3 +27,6 @@ I use this appliaction deployed in Docker for sending messages from Zabbix serve
 ```#!/bin/bash
 wget -O- "http://TGSENDER_HOSTNAME:8080/sendMsg?chatId=$1&text=${2// /%20}"
 ```
+
+## Docker deployment
+To deploy as docker container `docker build -t tgsender https://github.com/iakkuratov/TgSender.git`
